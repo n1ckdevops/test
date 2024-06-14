@@ -33,4 +33,7 @@ h1 {
   font-size: 41px;
   line-height: 120%;
 }
+.router-link-exact-active {
+  color: #a24545 !important;
+}
 </style>
