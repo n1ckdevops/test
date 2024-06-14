@@ -7,26 +7,38 @@
           <h1 class="main-wrapper_title">
             Проверьте штрафы и зарегестрируйтесь в 1 клик
           </h1>
-          <form class="row g-3 main-form">
+          <form class="row g-3 main-form" @submit.prevent="handleSubmit">
             <div class="col-md-7">
-              <label for="validationServer01" class="form-label"
+              <label for="validationCustom01" class="form-label"
                 >Номер автомобиля</label
               >
               <input
                 type="text"
                 class="form-control"
                 id="validationCustom01"
+                v-model="form.carNumber"
+                @blur="validateField('carNumber')"
+                :class="{ 'is-invalid': errors.carNumber }"
                 required
               />
+              <div v-if="errors.carNumber" class="invalid-feedback">
+                {{ errors.carNumber }}
+              </div>
             </div>
             <div class="col-md-5">
-              <label for="inputPassword4" class="form-label">Регион</label>
+              <label for="validationCustom02" class="form-label">Регион</label>
               <input
                 type="text"
                 class="form-control"
                 id="validationCustom02"
+                v-model="form.region"
+                @blur="validateField('region')"
+                :class="{ 'is-invalid': errors.region }"
                 required
               />
+              <div v-if="errors.region" class="invalid-feedback">
+                {{ errors.region }}
+              </div>
             </div>
             <div class="col-12" style="margin-top: 6px">
               <label for="inputAddress" class="form-label"
@@ -36,8 +48,17 @@
                 type="text"
                 class="form-control"
                 id="inputAddress"
+                v-model="form.registrationCertificate"
+                @blur="validateField('registrationCertificate')"
+                :class="{ 'is-invalid': errors.registrationCertificate }"
                 required
               />
+              <div
+                v-if="errors.registrationCertificate"
+                class="invalid-feedback"
+              >
+                {{ errors.registrationCertificate }}
+              </div>
             </div>
             <div class="col-5">
               <button type="submit" class="btn btn-primary">
@@ -357,13 +378,54 @@
 
 <!-- corusel script -->
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Pagination, Navigation } from "swiper/modules";
 import { useRouter } from "vue-router";
+
+const form = reactive({
+  carNumber: "",
+  region: "",
+  registrationCertificate: "",
+});
+
+const errors = reactive({
+  carNumber: null,
+  region: null,
+  registrationCertificate: null,
+});
+
+const validateField = (field) => {
+  if (field === "carNumber") {
+    errors.carNumber =
+      form.carNumber.length < 3
+        ? "Номер автомобиля должен содержать не менее 3 символов"
+        : null;
+  } else if (field === "region") {
+    errors.region =
+      form.region.length < 2
+        ? "Регион должен содержать не менее 2 символов"
+        : null;
+  } else if (field === "registrationCertificate") {
+    errors.registrationCertificate =
+      form.registrationCertificate.length < 5
+        ? "Свидетельство о регистрации ТС должно содержать не менее 5 символов"
+        : null;
+  }
+};
+
+const handleSubmit = () => {
+  validateField("carNumber");
+  validateField("region");
+  validateField("registrationCertificate");
+
+  if (!errors.carNumber && !errors.region && !errors.registrationCertificate) {
+    alert("Форма отправлена успешно!");
+  }
+};
 
 const router = useRouter();
 
@@ -408,6 +470,14 @@ const modules = [Pagination, Navigation];
 
 <!-- form styles -->
 <style lang="scss" scoped>
+.is-invalid {
+  border-color: red;
+}
+
+.invalid-feedback {
+  color: red;
+  font-size: 0.875rem;
+}
 .main {
   color: #000;
   font-family: PT Sans;
